@@ -171,14 +171,6 @@ L^{\text{CLIP}}(\theta)=\mathbb{E}_t\Big[\min\big( \frac{\pi_{\theta}(a_t|s_t)}{
       </categories>
   </entry>
   <entry>
-    <title>LightRAG: Simple and fast retrieval-augmented generation</title>
-    <url>/post/0.html</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Paper reading</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Privacy-protected Retrieval-Augmented Generation for Knowledge Graph Question Answering</title>
     <url>/post/3cf07239.html</url>
     <content><![CDATA[这篇文章大抵是詹密写的（不排除是串子或者詹黑，甚至这个可能性还大点？哈哈哈），证据见下图：
@@ -267,6 +259,14 @@ ARoG 给出的答案很有启发性：既然不能把真实实体暴露给模型
 说到这篇工作的不足之处，我觉得抽象概念的质量很依赖 LLM 本身的泛化能力，不论是生成高层概念标签还是抽象概念路径。可以在框架的基础上，增添一个回溯机制，防止因跳错节点而导致的错误累积。
 另外，在我跑了项目代码以及和学长讨论过后，我们觉得论文的方法其实比较复杂，导致检索的效率并不高（实测下来前两个问题平均一个就要将近两分钟），而且一开始的假设也存在不足——论文认为真实实体是绝对不能暴露给大模型的，但是关系可以。但现实生活中，关系其实也蕴含了很多隐私内容，后续工作可以从这里入手，如何在保护实体和关系的同时，能做到准确的信息检索。
 ]]></content>
+      <categories>
+        <category>Paper reading</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>LightRAG: Simple and fast retrieval-augmented generation</title>
+    <url>/post/0.html</url>
+    <content><![CDATA[]]></content>
       <categories>
         <category>Paper reading</category>
       </categories>
@@ -749,6 +749,144 @@ f(q, m) \cdot f(k, n) = q \cdot k \cdot e^{i(m-n)\theta}]]></content>
     <title></title>
     <url>/js/ali_font.js</url>
     <content><![CDATA[window._iconfont_svg_string_4894301='',(n=>{var t=(e=(e=document.getElementsByTagName("script"))[e.length-1]).getAttribute("data-injectcss"),e=e.getAttribute("data-disable-injectsvg");if(!e){var i,o,a,d,c,l=function(t,e){e.parentNode.insertBefore(t,e)};if(t&&!n.__iconfont__svg__cssinject__){n.__iconfont__svg__cssinject__=!0;try{document.write(".svgfont {display: inline-block;width: 1em;height: 1em;fill: currentColor;vertical-align: -0.1em;font-size:16px;}")}catch(t){console&&console.log(t)}}i=function(){var t,e=document.createElement("div");e.innerHTML=n._iconfont_svg_string_4894301,(e=e.getElementsByTagName("svg")[0])&&(e.setAttribute("aria-hidden","true"),e.style.position="absolute",e.style.width=0,e.style.height=0,e.style.overflow="hidden",e=e,(t=document.body).firstChild?l(e,t.firstChild):t.appendChild(e))},document.addEventListener?~["complete","loaded","interactive"].indexOf(document.readyState)?setTimeout(i,0):(o=function(){document.removeEventListener("DOMContentLoaded",o,!1),i()},document.addEventListener("DOMContentLoaded",o,!1)):document.attachEvent&&(a=i,d=n.document,c=!1,r(),d.onreadystatechange=function(){"complete"==d.readyState&&(d.onreadystatechange=null,s())})}function s(){c||(c=!0,a())}function r(){try{d.documentElement.doScroll("left")}catch(t){return void setTimeout(r,50)}s()}})(window);]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/js/clock-amap-noop.js</url>
+    <content><![CDATA[/* The clock plugin always injects an auxiliary script.  Weather is handled by clock-amap.js. */
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/js/clock-amap.js</url>
+    <content><![CDATA[/* global gaud_map_key, clock_rectangle, clock_default_rectangle_enable */
+// Amap-only replacement for hexo-butterfly-clock-anzhiyu's QWeather script.
+// Time is intentionally independent from network requests, so it remains visible
+// even when location or weather lookup fails.
+;(function () {
+  'use strict'
+
+  var root = document.getElementById('hexo_electric_clock')
+  if (!root) return
+
+  var key = typeof gaud_map_key === 'string' ? gaud_map_key.trim() : ''
+  var fallbackLocation = typeof clock_rectangle === 'string' && clock_rectangle
+    ? clock_rectangle
+    : '112.982279,28.19409'
+  var useFallbackLocation = String(clock_default_rectangle_enable) === 'true'
+  var weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+
+  root.innerHTML = [
+    '',
+    '',
+    '天气加载中…',
+    '💧 --%',
+    '',
+    '',
+    '',
+    '⌁ --',
+    '正在定位…',
+    '',
+    ''
+  ].join('')
+
+  var dateElement = document.getElementById('card-clock-clockdate')
+  var timeElement = document.getElementById('card-clock-time')
+  var meridiemElement = document.getElementById('card-clock-dackorlight')
+  var weatherElement = document.getElementById('card-clock-weather')
+  var humidityElement = document.getElementById('card-clock-humidity')
+  var windElement = document.getElementById('card-clock-wind')
+  var locationElement = document.getElementById('card-clock-location')
+
+  function pad(number) {
+    return String(number).padStart(2, '0')
+  }
+
+  function updateTime() {
+    var now = new Date()
+    var hour = now.getHours()
+    dateElement.textContent = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + ' ' + weekdays[now.getDay()]
+    timeElement.textContent = pad(hour) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds())
+    meridiemElement.textContent = hour >= 12 ? ' P M' : ' A M'
+  }
+
+  function weatherIcon(weather) {
+    if (/雷/.test(weather)) return '⚡'
+    if (/雪|冰雹/.test(weather)) return '❄️'
+    if (/雨/.test(weather)) return '🌧️'
+    if (/雾|霾|沙|尘/.test(weather)) return '🌫️'
+    if (/阴|云/.test(weather)) return '☁️'
+    return '☀️'
+  }
+
+  function request(url) {
+    return fetch(url).then(function (response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status)
+      return response.json()
+    }).then(function (data) {
+      if (data.status !== '1') throw new Error(data.info || data.infocode || '高德接口请求失败')
+      return data
+    })
+  }
+
+  function getLocationFromCoordinates() {
+    var url = 'https://restapi.amap.com/v3/geocode/regeo?key=' + encodeURIComponent(key) + '&location=' + encodeURIComponent(fallbackLocation) + '&extensions=base'
+    return request(url).then(function (data) {
+      var component = data.regeocode && data.regeocode.addressComponent
+      if (!component || !component.adcode) throw new Error('高德逆地理编码未返回 adcode')
+      return {
+        adcode: component.adcode,
+        city: component.city || component.province || component.district || '未知地点'
+      }
+    })
+  }
+
+  function getLocation() {
+    if (useFallbackLocation) return getLocationFromCoordinates()
+
+    var ipUrl = 'https://restapi.amap.com/v3/ip?key=' + encodeURIComponent(key)
+    return request(ipUrl).then(function (data) {
+      if (!data.adcode) throw new Error('高德 IP 定位未返回 adcode')
+      return {
+        adcode: data.adcode,
+        city: data.city || data.province || '未知地点'
+      }
+    }).catch(function () {
+      // IP 定位常因境外访问、代理或隐私设置失败，回退到配置的固定坐标。
+      return getLocationFromCoordinates()
+    })
+  }
+
+  function showWeather(location) {
+    locationElement.textContent = location.city
+    var weatherUrl = 'https://restapi.amap.com/v3/weather/weatherInfo?key=' + encodeURIComponent(key) + '&city=' + encodeURIComponent(location.adcode) + '&extensions=base'
+    return request(weatherUrl).then(function (data) {
+      var live = data.lives && data.lives[0]
+      if (!live) throw new Error('高德天气接口未返回实况数据')
+      var weather = live.weather || '未知'
+      weatherElement.textContent = weatherIcon(weather) + ' ' + weather + ' ' + (live.temperature || '--') + ' ℃'
+      humidityElement.textContent = '💧 ' + (live.humidity || '--') + '%'
+      windElement.textContent = '⌁ ' + (live.winddirection || '--') + '风 ' + (live.windpower || '--') + '级'
+    })
+  }
+
+  updateTime()
+  window.setInterval(updateTime, 1000)
+
+  if (!key) {
+    weatherElement.textContent = '未配置高德 Key'
+    locationElement.textContent = '定位不可用'
+    return
+  }
+
+  getLocation().then(showWeather).catch(function (error) {
+    weatherElement.textContent = '天气加载失败'
+    locationElement.textContent = '定位失败'
+    // Keep the error available to the site owner without breaking the clock.
+    console.warn('[electric-clock] 高德数据加载失败：', error.message)
+  })
+})()
+]]></content>
   </entry>
   <entry>
     <title>友人链</title>
